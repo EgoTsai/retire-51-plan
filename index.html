@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="51歲退休規劃" />
+  <title>51 歲退休 30 年試算</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --sub: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --blue-soft: rgba(37, 99, 235, 0.10);
+      --green: #059669;
+      --green-soft: rgba(5, 150, 105, 0.11);
+      --amber: #d97706;
+      --amber-soft: rgba(217, 119, 6, 0.12);
+      --red: #dc2626;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0b1120;
+        --card: #131c31;
+        --sub: #1b2640;
+        --border: #24324d;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --blue: #60a5fa;
+        --blue-soft: rgba(96, 165, 250, 0.14);
+        --green: #34d399;
+        --green-soft: rgba(52, 211, 153, 0.14);
+        --amber: #fbbf24;
+        --amber-soft: rgba(251, 191, 36, 0.14);
+        --red: #f87171;
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0b1120;
+      --card: #131c31;
+      --sub: #1b2640;
+      --border: #24324d;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --blue: #60a5fa;
+      --blue-soft: rgba(96, 165, 250, 0.14);
+      --green: #34d399;
+      --green-soft: rgba(52, 211, 153, 0.14);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.14);
+      --red: #f87171;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: calc(32px + env(safe-area-inset-bottom));
+    }
+
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Header */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .title-block h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .title-block p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Preset Pills */
+    .preset-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .preset-btn {
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 10px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .preset-btn small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+    .preset-btn.active {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    /* Answer Cards */
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 540px) {
+      .answers { grid-template-columns: 1fr; }
+    }
+    .ans-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .ans-card.highlight {
+      border-color: var(--green);
+    }
+    .ans-tag {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge-blue { background: var(--blue-soft); color: var(--blue); }
+    .badge-green { background: var(--green-soft); color: var(--green); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+
+    .big-num {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+    }
+    .big-num .unit {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .ans-blue { color: var(--blue); }
+    .ans-green { color: var(--green); }
+
+    .ans-meta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Summary Strip */
+    .strip {
+      background: var(--sub);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .strip strong { color: var(--text); }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card-head h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    /* Controls */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 460px) {
+      .input-grid { grid-template-columns: 1fr; }
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .input-box {
+      display: flex;
+      align-items: center;
+      background: var(--sub);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0 10px;
+    }
+    .input-box input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      padding: 9px 0;
+      outline: none;
+      font-variant-numeric: tabular-nums;
+    }
+    .input-box span {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      margin-left: 6px;
+    }
+
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .slider-top .label { font-weight: 600; }
+    .slider-top .val {
+      font-weight: 800;
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .slider-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: -2px;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    /* Toggle Switch */
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--sub);
+      border-radius: 12px;
+      font-size: 13px;
+    }
+    .switch-row small {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider-sw {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .slider-sw::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .switch input:checked + .slider-sw { background: var(--green); }
+    .switch input:checked + .slider-sw::before { transform: translateX(20px); }
+
+    .pension-fields.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .pension-summary {
+      background: var(--green-soft);
+      color: var(--green);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.55;
+    }
+
+    /* Chart */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .dot { width: 10px; height: 3px; border-radius: 2px; display: inline-block; }
+
+    .chart-box {
+      position: relative;
+      width: 100%;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 240px;
+      touch-action: pan-y;
+    }
+    .chart-readout {
+      margin-top: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: var(--sub);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .chart-readout strong { color: var(--text); }
+
+    /* Collapsible Table */
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 2px 0;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    .summary-arrow { transition: transform 0.2s; color: var(--muted); font-size: 12px; }
+    details[open] .summary-arrow { transform: rotate(180deg); }
+
+    .table-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 8px;
+    }
+    .seg-btn {
+      border: 1px solid var(--border);
+      background: var(--sub);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .seg-btn.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      max-height: 380px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    th, td {
+      padding: 8px 10px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+    th:first-child, td:first-child { text-align: left; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--sub);
+      color: var(--muted);
+      font-weight: 700;
+      z-index: 1;
+    }
+    tr.milestone { background: var(--amber-soft); font-weight: 700; }
+
+    /* Footer Actions */
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding-top: 4px;
+    }
+    .action-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .action-btn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      background: #0f172a;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 99;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .foot-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- Header -->
+    <div class="top-bar">
+      <div class="title-block">
+        <h1>51 歲退休 30 年試算</h1>
+        <p>51 → 81 歲・含勞動基金、勞保與國民年金・今日購買力</p>
+      </div>
+      <button id="btn-theme" class="icon-btn" aria-label="切換深淺色">🌙 深色</button>
+    </div>
+
+    <!-- 3 Quick Scenario Presets -->
+    <div class="preset-row">
+      <button class="preset-btn" data-r="5.0">保守 5.0%<small>股債防禦</small></button>
+      <button class="preset-btn active" data-r="6.5">穩健 6.5%<small>推薦基準</small></button>
+      <button class="preset-btn" data-r="8.0">積極 8.0%<small>成長配置</small></button>
+    </div>
+
+    <!-- Main Answer Cards -->
+    <div class="answers">
+      <div class="ans-card">
+        <div class="ans-tag">
+          <span>1. 完全不工作</span>
+          <span class="badge badge-blue" id="s1-wr">提領 5.1%</span>
+        </div>
+        <div class="big-num ans-blue"><span id="s1-monthly">--</span><span class="unit">元 / 月</span></div>
+        <div class="ans-meta">
+          <span id="s1-yearly">每年可花 -- 萬（今日物價）</span>
+          <span id="s1-safe">留 30% 安全本金：-- 元/月</span>
+        </div>
+      </div>
+
+      <div class="ans-card highlight">
+        <div class="ans-tag">
+          <span>2. 兼職至 <span id="lbl-work-age">65</span> 歲</span>
+          <span class="badge badge-green" id="s2-diff">每月 +--</span>
+        </div>
+        <div class="big-num ans-green"><span id="s2-monthly">--</span><span class="unit">元 / 月</span></div>
+        <div class="ans-meta">
+          <span id="s2-yearly">每年可花 -- 萬（今日物價）</span>
+          <span id="s2-safe">留 30% 安全本金：-- 元/月</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Capital Summary Strip -->
+    <div class="strip">
+      <span>51 歲起始總資金：<strong id="sum-capital">-- 萬</strong></span>
+      <span>實質報酬率（扣通膨）：<strong id="sum-real">--%</strong></span>
+    </div>
+
+    <!-- Card A: Core Capital & Work Settings -->
+    <div class="card">
+      <div class="card-head">
+        <h2>一、退休資金與兼職收入</h2>
+        <span class="badge badge-amber">自動儲存在本機</span>
+      </div>
+
+      <div class="input-grid">
+        <div class="field">
+          <label for="inp-assets">目前投資資產（含美股＋台股）</label>
+          <div class="input-box">
+            <input id="inp-assets" type="number" inputmode="decimal" min="0" step="10" value="2000" />
+            <span>萬台幣</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="inp-company">公司額外退休金</label>
+          <div class="input-box">
+            <input id="inp-company" type="number" inputmode="decimal" min="0" step="10" value="500" />
+            <span>萬台幣</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="label">方案 2 偶爾工作平均年薪</span>
+          <span class="val" id="val-work">40 萬 / 年</span>
+        </div>
+        <input id="sl-work" type="range" min="0" max="100" step="5" value="40" />
+        <div class="slider-hint">51 歲做到 65 歲（共 14 年），之後完全不工作</div>
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="label">預期年化投資報酬率</span>
+          <span class="val" id="val-return">6.5%</span>
+        </div>
+        <input id="sl-return" type="range" min="3.0" max="10.0" step="0.1" value="6.5" />
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="label">長期年通膨率</span>
+          <span class="val" id="val-inf">2.5%</span>
+        </div>
+        <input id="sl-inf" type="range" min="1.0" max="4.5" step="0.1" value="2.5" />
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="label">81 歲想留存的本金（今日購買力）</span>
+          <span class="val" id="val-legacy">0 萬（30 年花完）</span>
+        </div>
+        <input id="sl-legacy" type="range" min="0" max="1500" step="50" value="0" />
+      </div>
+    </div>
+
+    <!-- Card B: Taiwan Statutory Pensions -->
+    <div class="card">
+      <div class="card-head">
+        <h2>二、台灣政府退休金（勞動基金・勞保・國保）</h2>
+      </div>
+
+      <div class="switch-row">
+        <div>
+          <strong>計入政府退休金收入</strong>
+          <small>關閉可對比「完全只靠自己資產」的差距</small>
+        </div>
+        <label class="switch">
+          <input id="chk-gov" type="checkbox" checked />
+          <span class="slider-sw"></span>
+        </label>
+      </div>
+
+      <div id="pension-fields" class="pension-fields" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="label">60 歲起｜勞工退休金（勞動基金專戶）</span>
+            <span class="val" id="val-lf">10,000 元 / 月</span>
+          </div>
+          <input id="sl-lf" type="range" min="0" max="30000" step="500" value="10000" />
+          <div class="slider-hint">滿 60 歲可請領月退（約專戶 220 萬按餘命換算；51→60 歲專戶仍持續參與勞動基金分紅）</div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="label">65 歲起｜勞保老年年金</span>
+            <span class="val" id="val-li">18,000 元 / 月</span>
+          </div>
+          <input id="sl-li" type="range" min="0" max="40000" step="500" value="18000" />
+          <div class="slider-hint">公式：最高 60 月平均投保薪資 45,800 × 年資 × 1.55%（25 年資約 17,748 元；28 年約 19,877 元）</div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="label">65 歲起｜國民年金（B 式）</span>
+            <span class="val" id="val-np">3,600 元 / 月</span>
+          </div>
+          <input id="sl-np" type="range" min="0" max="8000" step="200" value="3600" />
+          <div class="slider-hint">51～65 歲無勞保自動納保 14 年（月繳約 1,200），65 歲起終身月領 19,761 × 14 × 1.3% ≈ 3,597 元</div>
+        </div>
+
+        <div class="switch-row">
+          <div>
+            <strong>方案 2 兼職期間「續保勞保」</strong>
+            <small>年薪 40 萬有保勞保不繳國保，多累 14 年勞保年資（65 歲勞保多領約 +9,900/月）</small>
+          </div>
+          <label class="switch">
+            <input id="chk-s2-li" type="checkbox" />
+            <span class="slider-sw"></span>
+          </label>
+        </div>
+
+        <div class="pension-summary" id="pension-summary">
+          60～64 歲政府月領 10,000 元 ｜ 65 歲起月領 31,600 元
+        </div>
+      </div>
+    </div>
+
+    <!-- Card C: 30-Year Trajectory Chart -->
+    <div class="card">
+      <div class="card-head">
+        <h2>三、51 → 81 歲資產走勢（今日萬台幣）</h2>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--blue)"></i>方案 1：不工作</span>
+        <span><i class="dot" style="background:var(--green)"></i>方案 2：做到 65 歲</span>
+        <span><i class="dot" style="background:var(--amber)"></i>60 歲勞退 / 65 歲勞保</span>
+      </div>
+      <div class="chart-box">
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="chart-readout" id="chart-readout">
+        <span>點選或滑動圖表可查看各年齡資產</span>
+      </div>
+    </div>
+
+    <!-- Card D: Collapsible 30-Year Table -->
+    <div class="card">
+      <details id="det-table">
+        <summary>
+          <span>四、查看 51 → 81 歲逐年明細表</span>
+          <span class="summary-arrow">▼ 展開</span>
+        </summary>
+
+        <div class="table-tools">
+          <button class="seg-btn" data-sc="s1">方案 1 不工作</button>
+          <button class="seg-btn active" data-sc="s2">方案 2 兼職</button>
+          <button class="seg-btn active" data-unit="real">今日購買力</button>
+          <button class="seg-btn" data-unit="nom">當年物價（含通膨）</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>年齡</th>
+                <th>每月可花</th>
+                <th>兼職/政府年金</th>
+                <th>年底剩餘資產</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <!-- Footer Sync & Reset -->
+    <div class="footer-actions">
+      <button id="btn-share" class="action-btn primary">複製我的私人設定連結</button>
+      <button id="btn-reset" class="action-btn">恢復預設值</button>
+    </div>
+
+    <div class="foot-note">
+      所有試算均在你的手機／瀏覽器端完成，不會上傳任何個人財務資料。<br />
+      「私人設定連結」僅透過瀏覽器 # 錨點傳遞，不會傳送到伺服器。
+    </div>
+  </div>
+
+  <div id="toast" class="toast">已複製！</div>
+
+  <script>
+    const STORAGE_KEY = 'retire51_plan_v1';
+    const DEFAULTS = {
+      assets: 2000,       // 萬台幣 (公開頁面中性預設，私人數字透過 #hash 或本機輸入儲存)
+      company: 500,       // 萬台幣
+      workAnnual: 40,     // 萬台幣/年
+      workUntil: 65,      // 歲
+      retireAge: 51,
+      years: 30,
+      nomReturn: 6.5,     // %
+      inflation: 2.5,     // %
+      legacy: 0,          // 萬台幣
+      useGov: true,
+      laborFund60: 10000, // 60歲起 勞退新制(勞動基金) 元/月
+      laborIns65: 18000,  // 65歲起 勞保老年年金 元/月
+      natPen65: 3600,     // 65歲起 國民年金B式 元/月
+      s2KeepLaborIns: false, // 方案2兼職期間改續保勞保
+    };
+
+    let state = { ...DEFAULTS };
+    let tableScenario = 's2';
+    let tableUnit = 'real';
+    let lastSim = null;
+    let hoverIdx = null;
+
+    // ---------- Load from Hash (Private Bookmark) or LocalStorage ----------
+    function loadInitialState() {
+      // 1. Load saved local state first
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (saved && typeof saved === 'object') {
+          state = { ...DEFAULTS, ...saved };
+        }
+      } catch (_) {}
+
+      // 2. If URL has #hash parameters, apply & persist privately, then clean URL
+      if (window.location.hash && window.location.hash.length > 1) {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const mapNum = [
+          ['a', 'assets'], ['p', 'company'], ['w', 'workAnnual'], ['wa', 'workUntil'],
+          ['r', 'nomReturn'], ['i', 'inflation'], ['leg', 'legacy'],
+          ['lf', 'laborFund60'], ['li', 'laborIns65'], ['np', 'natPen65']
+        ];
+        let changed = false;
+        mapNum.forEach(([k, key]) => {
+          if (params.has(k)) {
+            const v = parseFloat(params.get(k));
+            if (!Number.isNaN(v) && v >= 0) {
+              state[key] = v;
+              changed = true;
+            }
+          }
+        });
+        if (params.has('gp')) { state.useGov = params.get('gp') !== '0'; changed = true; }
+        if (params.has('s2li')) { state.s2KeepLaborIns = params.get('s2li') === '1'; changed = true; }
+        if (changed) {
+          saveState();
+          // Strip hash so numbers aren't left visible in URL bar
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          showToast('已載入並儲存你的專屬試算設定');
+        }
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (_) {}
+    }
+
+    // ---------- Financial Engine ----------
+    function monthlyRealRate(nomPct, infPct) {
+      const rReal = (1 + nomPct / 100) / (1 + infPct / 100) - 1;
+      return Math.pow(1 + rReal, 1 / 12) - 1;
+    }
+
+    function getGovConfig(isScenario2) {
+      if (!state.useGov) return { lf60: 0, li65: 0, np65: 0 };
+      const workYrs = Math.max(0, state.workUntil - state.retireAge);
+      if (isScenario2 && state.s2KeepLaborIns && state.workAnnual > 0) {
+        // 續保勞保：不繳國保(np=0)，多累 workYrs 年年資，以最高投保薪資45,800計每年+710元/月
+        const extraLi = Math.round(45800 * 0.0155 * workYrs);
+        return { lf60: state.laborFund60, li65: state.laborIns65 + extraLi, np65: 0 };
+      }
+      return { lf60: state.laborFund60, li65: state.laborIns65, np65: state.natPen65 };
+    }
+
+    function simulate(P0, monthlySpend, opts) {
+      const rm = monthlyRealRate(state.nomReturn, state.inflation);
+      const N = state.years * 12;
+      const Nw = opts.workYears * 12;
+      let bal = P0;
+      const yearly = [];
+
+      for (let y = 0; y < state.years; y++) {
+        let yrSpend = 0, yrIncome = 0;
+        for (let mo = 0; mo < 12; mo++) {
+          const m = y * 12 + mo;
+          const age = state.retireAge + m / 12;
+          bal -= monthlySpend;
+          yrSpend += monthlySpend;
+          bal *= (1 + rm);
+
+          let inc = 0;
+          if (m < Nw) inc += opts.workAnnual / 12;
+          if (age >= 60) inc += opts.gov.lf60;
+          if (age >= 65) inc += opts.gov.li65 + opts.gov.np65;
+          bal += inc;
+          yrIncome += inc;
+        }
+        yearly.push({
+          age: state.retireAge + y,
+          year: 2027 + y,
+          monthlySpend,
+          yrIncome,
+          endBal: bal,
+          infFactor: Math.pow(1 + state.inflation / 100, y),
+        });
+      }
+      return { endBal: bal, yearly };
+    }
+
+    function solveMaxMonthly(P0, opts, targetEnd) {
+      let lo = 0;
+      let hi = (P0 + opts.workAnnual * opts.workYears + 150000 * 360) / 12;
+      for (let k = 0; k < 58; k++) {
+        const mid = (lo + hi) / 2;
+        if (simulate(P0, mid, opts).endBal >= targetEnd) lo = mid;
+        else hi = mid;
+      }
+      return lo;
+    }
+
+    // ---------- Formatters ----------
+    const fmtInt = (n) => Math.round(n).toLocaleString('zh-TW');
+    const fmtWan = (n) => (n / 10000).toLocaleString('zh-TW', { maximumFractionDigits: 1 });
+
+    // ---------- Render ----------
+    function syncInputsFromState() {
+      document.getElementById('inp-assets').value = state.assets;
+      document.getElementById('inp-company').value = state.company;
+      document.getElementById('sl-work').value = state.workAnnual;
+      document.getElementById('sl-return').value = state.nomReturn;
+      document.getElementById('sl-inf').value = state.inflation;
+      document.getElementById('sl-legacy').value = state.legacy;
+      document.getElementById('chk-gov').checked = state.useGov;
+      document.getElementById('sl-lf').value = state.laborFund60;
+      document.getElementById('sl-li').value = state.laborIns65;
+      document.getElementById('sl-np').value = state.natPen65;
+      document.getElementById('chk-s2-li').checked = state.s2KeepLaborIns;
+      updatePresetHighlight();
+    }
+
+    function updatePresetHighlight() {
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        const r = parseFloat(btn.dataset.r);
+        btn.classList.toggle('active', Math.abs(state.nomReturn - r) < 0.05);
+      });
+    }
+
+    function recalc() {
+      const P0 = (state.assets + state.company) * 10000;
+      const workYears = Math.max(0, state.workUntil - state.retireAge);
+      const targetEnd = state.legacy * 10000;
+
+      const gov1 = getGovConfig(false);
+      const gov2 = getGovConfig(true);
+      const govZero = { lf60: 0, li65: 0, np65: 0 };
+
+      const opts1 = { workYears: 0, workAnnual: 0, gov: gov1 };
+      const opts2 = { workYears, workAnnual: state.workAnnual * 10000, gov: gov2 };
+
+      const w1 = solveMaxMonthly(P0, opts1, targetEnd);
+      const w2 = solveMaxMonthly(P0, opts2, targetEnd);
+      const w1Safe = solveMaxMonthly(P0, opts1, P0 * 0.3);
+      const w2Safe = solveMaxMonthly(P0, opts2, P0 * 0.3);
+      const w1NoGov = solveMaxMonthly(P0, { workYears: 0, workAnnual: 0, gov: govZero }, targetEnd);
+
+      const sim1 = simulate(P0, w1, opts1);
+      const sim2 = simulate(P0, w2, opts2);
+      lastSim = { P0, w1, w2, sim1, sim2 };
+
+      // Top Cards
+      document.getElementById('s1-monthly').textContent = fmtInt(w1);
+      document.getElementById('s1-wr').textContent = `提領 ${P0 > 0 ? ((w1 * 12 / P0) * 100).toFixed(1) : '0.0'}%`;
+      document.getElementById('s1-yearly').textContent = `每年可花 ${fmtWan(w1 * 12)} 萬（今日物價）`;
+      document.getElementById('s1-safe').textContent = `留 30% 安全墊：${fmtInt(w1Safe)} 元/月`;
+
+      document.getElementById('lbl-work-age').textContent = state.workUntil;
+      document.getElementById('s2-monthly').textContent = fmtInt(w2);
+      document.getElementById('s2-diff').textContent = `每月 +${fmtInt(w2 - w1)}`;
+      document.getElementById('s2-yearly').textContent = `每年可花 ${fmtWan(w2 * 12)} 萬（今日物價）`;
+      document.getElementById('s2-safe').textContent = `留 30% 安全墊：${fmtInt(w2Safe)} 元/月`;
+
+      // Strip
+      const realAnnual = ((1 + state.nomReturn / 100) / (1 + state.inflation / 100) - 1) * 100;
+      document.getElementById('sum-capital').textContent = `${fmtWan(P0)} 萬`;
+      document.getElementById('sum-real').textContent = `${realAnnual.toFixed(2)}%`;
+
+      // Slider readouts
+      document.getElementById('val-work').textContent = `${state.workAnnual} 萬 / 年`;
+      document.getElementById('val-return').textContent = `${state.nomReturn.toFixed(1)}%`;
+      document.getElementById('val-inf').textContent = `${state.inflation.toFixed(1)}%`;
+      document.getElementById('val-legacy').textContent = state.legacy === 0 ? '0 萬（30 年花完）' : `${state.legacy.toLocaleString()} 萬`;
+      document.getElementById('val-lf').textContent = `${fmtInt(state.laborFund60)} 元 / 月`;
+      document.getElementById('val-li').textContent = `${fmtInt(state.laborIns65)} 元 / 月`;
+      document.getElementById('val-np').textContent = `${fmtInt(state.natPen65)} 元 / 月`;
+
+      // Pension section state & summary
+      document.getElementById('pension-fields').classList.toggle('disabled', !state.useGov);
+      const govBoost = Math.max(0, w1 - w1NoGov);
+      const sum60 = gov1.lf60;
+      const sum65 = gov1.lf60 + gov1.li65 + gov1.np65;
+      const sum65S2 = gov2.lf60 + gov2.li65 + gov2.np65;
+      let pText = `60～64 歲政府月領 ${fmtInt(sum60)} 元 ｜ 65 歲起月領 ${fmtInt(sum65)} 元`;
+      if (state.s2KeepLaborIns && state.workAnnual > 0) {
+        pText += `（方案 2 續保勞保達 ${fmtInt(sum65S2)} 元）`;
+      }
+      pText += `\n政府年金讓你從 51 歲起，每月可多花 +${fmtInt(govBoost)} 元！`;
+      document.getElementById('pension-summary').innerHTML = pText.replace('\n', '<br />');
+
+      drawChart();
+      renderTable();
+    }
+
+    // ---------- Chart ----------
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function drawChart() {
+      const canvas = document.getElementById('chart');
+      if (!canvas || !lastSim) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width < 10) return;
+      const W = rect.width, H = 240;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const cBlue = cssVar('--blue');
+      const cGreen = cssVar('--green');
+      const cAmber = cssVar('--amber');
+      const cBorder = cssVar('--border');
+      const cMuted = cssVar('--muted');
+      const cCard = cssVar('--card');
+
+      const s1 = [lastSim.P0 / 10000, ...lastSim.sim1.yearly.map(r => Math.max(0, r.endBal) / 10000)];
+      const s2 = [lastSim.P0 / 10000, ...lastSim.sim2.yearly.map(r => Math.max(0, r.endBal) / 10000)];
+      const N = s1.length - 1;
+      const maxVal = Math.max(...s1, ...s2, 500) * 1.1;
+
+      const pad = { top: 20, right: 14, bottom: 28, left: 50 };
+      const plotW = W - pad.left - pad.right;
+      const plotH = H - pad.top - pad.bottom;
+      const xOf = (i) => pad.left + (i / N) * plotW;
+      const yOf = (v) => pad.top + plotH - (Math.max(0, v) / maxVal) * plotH;
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+
+      // Horizontal grid
+      for (let i = 0; i <= 4; i++) {
+        const v = (maxVal / 4) * i;
+        const y = yOf(v);
+        ctx.strokeStyle = cBorder;
+        ctx.lineWidth = 1;
+        ctx.setLineDash(i === 0 ? [] : [3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(W - pad.right, y);
+        ctx.stroke();
+
+        ctx.fillStyle = cMuted;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${Math.round(v).toLocaleString()}萬`, pad.left - 6, y);
+      }
+      ctx.setLineDash([]);
+
+      // Milestones: Age 60 & 65
+      [ [60 - state.retireAge, '60歲勞退'], [65 - state.retireAge, '65歲勞保'] ].forEach(([idx, label]) => {
+        if (idx > 0 && idx < N) {
+          const x = xOf(idx);
+          ctx.strokeStyle = cAmber;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(x, pad.top);
+          ctx.lineTo(x, pad.top + plotH);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = cAmber;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(label, x, pad.top - 4);
+        }
+      });
+
+      // X labels
+      ctx.fillStyle = cMuted;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      for (let i = 0; i <= N; i += 5) {
+        ctx.fillText(`${state.retireAge + i}歲`, xOf(i), pad.top + plotH + 7);
+      }
+
+      const drawSeries = (arr, color) => {
+        ctx.beginPath();
+        arr.forEach((v, i) => i === 0 ? ctx.moveTo(xOf(i), yOf(v)) : ctx.lineTo(xOf(i), yOf(v)));
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.6;
+        ctx.stroke();
+      };
+
+      drawSeries(s1, cBlue);
+      drawSeries(s2, cGreen);
+
+      if (hoverIdx !== null) {
+        const x = xOf(hoverIdx);
+        ctx.strokeStyle = cMuted;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, pad.top + plotH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        [[s1[hoverIdx], cBlue], [s2[hoverIdx], cGreen]].forEach(([v, col]) => {
+          ctx.beginPath();
+          ctx.arc(x, yOf(v), 5, 0, Math.PI * 2);
+          ctx.fillStyle = col;
+          ctx.fill();
+          ctx.strokeStyle = cCard;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        });
+
+        const age = state.retireAge + hoverIdx;
+        document.getElementById('chart-readout').innerHTML = `
+          <span><strong>${age} 歲</strong>（${2027 + hoverIdx} 年）</span>
+          <span>不工作餘額：<strong>${Math.round(s1[hoverIdx]).toLocaleString()} 萬</strong></span>
+          <span>兼職餘額：<strong>${Math.round(s2[hoverIdx]).toLocaleString()} 萬</strong></span>
+        `;
+      }
+    }
+
+    function renderTable() {
+      if (!lastSim) return;
+      const sim = tableScenario === 's1' ? lastSim.sim1 : lastSim.sim2;
+      const isNom = tableUnit === 'nom';
+      document.getElementById('tbody').innerHTML = sim.yearly.map(r => {
+        const m = isNom ? r.infFactor : 1;
+        const mark = r.age === 60 ? ' (勞退)' : r.age === 65 ? ' (勞保)' : '';
+        return `
+          <tr class="${r.age === 60 || r.age === 65 ? 'milestone' : ''}">
+            <td>${r.age}歲${mark}</td>
+            <td>${fmtInt(r.monthlySpend * m)}</td>
+            <td>${r.yrIncome > 0 ? '+' + fmtWan(r.yrIncome * m) + '萬' : '—'}</td>
+            <td>${fmtWan(Math.max(0, r.endBal) * m)} 萬</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---------- Share / Toast / Theme ----------
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    function buildShareURL() {
+      const p = new URLSearchParams({
+        a: state.assets,
+        p: state.company,
+        w: state.workAnnual,
+        r: state.nomReturn,
+        i: state.inflation,
+        leg: state.legacy,
+        gp: state.useGov ? 1 : 0,
+        lf: state.laborFund60,
+        li: state.laborIns65,
+        np: state.natPen65,
+        s2li: state.s2KeepLaborIns ? 1 : 0,
+      });
+      return `${window.location.origin}${window.location.pathname}#${p.toString()}`;
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('retire51_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const mode = saved || (prefersDark ? 'dark' : 'light');
+      applyTheme(mode, false);
+    }
+
+    function applyTheme(mode, save = true) {
+      document.documentElement.setAttribute('data-theme', mode);
+      document.getElementById('btn-theme').textContent = mode === 'dark' ? '☀️ 淺色' : '🌙 深色';
+      if (save) localStorage.setItem('retire51_theme', mode);
+      drawChart();
+    }
+
+    // ---------- Bind Events ----------
+    function bindEvents() {
+      document.getElementById('btn-theme').addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme');
+        applyTheme(cur === 'dark' ? 'light' : 'dark');
+      });
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.nomReturn = parseFloat(btn.dataset.r);
+          document.getElementById('sl-return').value = state.nomReturn;
+          updatePresetHighlight();
+          saveState();
+          recalc();
+        });
+      });
+
+      const bindNum = (id, key) => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          state[key] = Math.max(0, parseFloat(e.target.value) || 0);
+          if (key === 'nomReturn') updatePresetHighlight();
+          saveState();
+          recalc();
+        });
+      };
+      bindNum('inp-assets', 'assets');
+      bindNum('inp-company', 'company');
+      bindNum('sl-work', 'workAnnual');
+      bindNum('sl-return', 'nomReturn');
+      bindNum('sl-inf', 'inflation');
+      bindNum('sl-legacy', 'legacy');
+      bindNum('sl-lf', 'laborFund60');
+      bindNum('sl-li', 'laborIns65');
+      bindNum('sl-np', 'natPen65');
+
+      document.getElementById('chk-gov').addEventListener('change', (e) => {
+        state.useGov = e.target.checked;
+        saveState();
+        recalc();
+      });
+      document.getElementById('chk-s2-li').addEventListener('change', (e) => {
+        state.s2KeepLaborIns = e.target.checked;
+        saveState();
+        recalc();
+      });
+
+      // Table toggles
+      document.querySelectorAll('[data-sc]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          tableScenario = btn.dataset.sc;
+          document.querySelectorAll('[data-sc]').forEach(b => b.classList.toggle('active', b === btn));
+          renderTable();
+        });
+      });
+      document.querySelectorAll('[data-unit]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          tableUnit = btn.dataset.unit;
+          document.querySelectorAll('[data-unit]').forEach(b => b.classList.toggle('active', b === btn));
+          renderTable();
+        });
+      });
+
+      // Touch & mouse chart interaction
+      const canvas = document.getElementById('chart');
+      const handlePointer = (clientX) => {
+        const rect = canvas.getBoundingClientRect();
+        const padLeft = 50, padRight = 14;
+        const ratio = (clientX - rect.left - padLeft) / (rect.width - padLeft - padRight);
+        hoverIdx = Math.max(0, Math.min(state.years, Math.round(ratio * state.years)));
+        drawChart();
+      };
+      canvas.addEventListener('mousemove', (e) => handlePointer(e.clientX));
+      canvas.addEventListener('touchstart', (e) => { if (e.touches[0]) handlePointer(e.touches[0].clientX); }, { passive: true });
+      canvas.addEventListener('touchmove', (e) => { if (e.touches[0]) handlePointer(e.touches[0].clientX); }, { passive: true });
+      canvas.addEventListener('mouseleave', () => { hoverIdx = null; drawChart(); });
+
+      // Copy private share link
+      document.getElementById('btn-share').addEventListener('click', async () => {
+        const url = buildShareURL();
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast('已複製私人連結，貼到手機即可同步！');
+        } catch (_) {
+          prompt('請手動複製以下私人設定連結：', url);
+        }
+      });
+
+      // Reset
+      document.getElementById('btn-reset').addEventListener('click', () => {
+        state = { ...DEFAULTS };
+        localStorage.removeItem(STORAGE_KEY);
+        syncInputsFromState();
+        recalc();
+        showToast('已恢復預設值');
+      });
+
+      window.addEventListener('resize', drawChart);
+    }
+
+    // ---------- Init ----------
+    loadInitialState();
+    initTheme();
+    syncInputsFromState();
+    bindEvents();
+    recalc();
+  </script>
+</body>
+</html>
